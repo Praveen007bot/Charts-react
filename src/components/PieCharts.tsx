@@ -1,13 +1,11 @@
-import { Button, Drawer, List } from "antd";
-import { useEffect, useRef, useState } from "react";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+
+import { useRef, useState } from "react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip as ReChartsTooltip } from "recharts";
 import { pieData } from "../../data";
 import type { ChartType } from "./BarCharts";
 import ReactApexChart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ReactECharts from "echarts-for-react";
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import {
     Chart as ChartJS,
     ArcElement,
@@ -16,27 +14,11 @@ import {
     type ChartData,
 } from "chart.js";
 import { Pie as ChartJSPie } from "react-chartjs-2";
+import ChartDisplay from "./ChartDisplay";
+import { PieChart as MiniPie } from 'react-minimal-pie-chart';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const barData: ChartType[] = [
-    {
-        title: "Recharts",
-        description: "Pie Chart in Recharts",
-    },
-    {
-        title: "Chart JS",
-        description: "Pie Chart in Chart JS",
-    },
-    {
-        title: "Apex Chart",
-        description: "Pie Chart in Apex Chart",
-    },
-    {
-        title: "Echarts",
-        description: "Pie Chart in Echarts",
-    },
-];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -148,21 +130,35 @@ const chartJsPieData: ChartData<"pie"> = {
 
 console.log(chartJsPieData.datasets[0].data);
 
+function MiniChart() {
+    const echartsRef = useRef<any>(null);
+
+    return (
+        <ReactECharts
+            ref={echartsRef}
+            option={miniPieEchartsOptions}
+            style={{ height: "100%", width: "100%" }}
+            notMerge={true}
+            theme="dark"
+        />
+    );
+}
+
+function SparkLinechart() {
+    return (
+        <MiniPie 
+            data={pieData}
+
+        />
+        
+    );
+}
+
 function PieCharts() {
-    const [open, setOpen] = useState(false);
-    const [miniOpen, setMiniOpen] = useState(false);
     const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
     const echartsRef = useRef<any>(null);
 
-    useEffect(() => {
-        if (open && selectedChart?.title === "Echarts" && echartsRef.current) {
-            setTimeout(() => {
-                echartsRef.current?.getEchartsInstance().resize();
-            }, 100);
-        }
-    }, [open, selectedChart]);
 
-    const navigate = useNavigate();
 
     const renderChart = () => {
         switch (selectedChart?.title) {
@@ -182,6 +178,7 @@ function PieCharts() {
                                     />
                                 ))}
                             </Pie>
+                        <ReChartsTooltip />
                         </PieChart>
                     </ResponsiveContainer>
                 );
@@ -216,82 +213,15 @@ function PieCharts() {
     };
 
     return (
-        <div className="p-4 h-screen flex flex-col w-full">
-            <div className="left">
-                <Button
-                    onClick={() => navigate("/")}
-                    color="primary"
-                    icon={<ArrowLeftOutlined />}
-                >
-                    Back
-                </Button>
-            </div>
-            <div className="flex flex-col items-center flex-1 justify-center">
-                <h1 className="text-2xl font-bold">Pie Charts</h1>
-                <List
-                    itemLayout="horizontal"
-                    dataSource={barData}
-                    renderItem={(item) => (
-                        <List.Item
-                            actions={[
-                                <Button
-                                    color="primary"
-                                    variant="solid"
-                                    onClick={() => {
-                                        setOpen(true);
-                                        setSelectedChart(item);
-                                    }}
-                                >
-                                    Open Chart
-                                </Button>,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                title={item.title}
-                                description={item.description}
-                            />
-                        </List.Item>
-                    )}
-                    style={{ width: "60%" }}
-                />
-            </div>
-
-            <Drawer
-                push={false}
-                open={open}
-                onClose={() => {
-                    setOpen(false);
-                    setSelectedChart(null);
-                    setMiniOpen(false);
-                }}
-                width={700}
-            >
-                {renderChart()}
-                <Button
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => setMiniOpen(true)}
-                >
-                    Show mini chart
-                </Button>
-                <Drawer
-                    placement="bottom"
-                    getContainer={false}
-                    open={miniOpen}
-                    onClose={() => setMiniOpen(false)}
-                >
-                    <div className="h-full w-full rounded-xl bg-black p-3 shadow-lg border border-[#334155]">
-                        <ReactECharts
-                            ref={echartsRef}
-                            option={miniPieEchartsOptions}
-                            style={{ height: "100%", width: "100%" }}
-                            notMerge={true}
-                            theme="dark"
-                        />
-                    </div>
-                </Drawer>
-            </Drawer>
-        </div>
+        <ChartDisplay
+            MiniChart={MiniChart}
+            renderChart={renderChart}
+            selectedChart={selectedChart}
+            setSelectedChart={setSelectedChart}
+            name={"Pie Chart"}
+            echartsRef={echartsRef}
+            SparkLinechart={SparkLinechart}
+        />
     );
 }
 

@@ -1,5 +1,4 @@
-import { Button, Drawer, List } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
     CartesianGrid,
     ResponsiveContainer,
@@ -14,8 +13,6 @@ import { scatterData } from "../../data";
 import ReactApexChart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import ReactECharts from "echarts-for-react";
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -38,25 +35,11 @@ ChartJS.register(
     ChartJsLegend
 );
 import { Scatter as ChartJSScatter } from "react-chartjs-2";
-
-const barData: ChartType[] = [
-    {
-        title: "Recharts",
-        description: "Scatter Chart in Recharts",
-    },
-    {
-        title: "Chart JS",
-        description: "Scatter Chart in Chart JS",
-    },
-    {
-        title: "Apex Chart",
-        description: "Scatter Chart in Apex Chart",
-    },
-    {
-        title: "Echarts",
-        description: "Scatter Chart in Echarts",
-    },
-];
+import ChartDisplay from "./ChartDisplay";
+import {
+    Sparklines,
+    SparklinesLine,
+} from "react-sparklines";
 
 const scatterApexOptions: ApexOptions = {
     xaxis: {},
@@ -71,7 +54,10 @@ const scatterApexSeries: ApexAxisChartSeries = [
 ];
 
 const scatterEchartsOptions = {
-    xAxis: {},
+    xAxis: {
+        min: 2.5,
+        max: 5
+    },
     yAxis: {},
     series: [
         {
@@ -91,19 +77,35 @@ const chartJsScatterData: ChartData<"scatter"> = {
     ],
 };
 
-function ScatterCharts() {
-    const [open, setOpen] = useState(false);
-    const [miniOpen, setMiniOpen] = useState(false);
-    const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
+function MiniChart() {
     const echartsRef = useRef<any>(null);
 
-    useEffect(() => {
-        if (open && selectedChart?.title === "Echarts" && echartsRef.current) {
-            setTimeout(() => {
-                echartsRef.current?.getEchartsInstance().resize();
-            }, 100);
-        }
-    }, [open, selectedChart]);
+    return (
+        <ReactECharts
+            ref={echartsRef}
+            option={scatterEchartsOptions}
+            style={{ height: 300, width: "100%" }}
+        />
+    );
+}
+
+function SparkLinechart() {
+    return (
+        <Sparklines
+            data={scatterData.map((item) => item.x)}
+            style={{ width: "100%", height: "100%" }}
+            limit={10}
+        >
+            <SparklinesLine
+                style={{ strokeWidth: 3, stroke: "#336aff", fill: "none" }}
+            />
+        </Sparklines>
+    );
+}
+
+function ScatterCharts() {
+    const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
+    const echartsRef = useRef<any>(null);
 
     const renderChart = () => {
         switch (selectedChart?.title) {
@@ -154,84 +156,17 @@ function ScatterCharts() {
                 return <div>Chart not implemented yet</div>;
         }
     };
-    const navigate = useNavigate();
 
     return (
-        <div className="p-4 h-screen flex flex-col w-full">
-            <div className="left">
-                <Button
-                    onClick={() => navigate("/")}
-                    color="primary"
-                    icon={<ArrowLeftOutlined />}
-                >
-                    Back
-                </Button>
-            </div>
-            <div className="flex flex-col items-center flex-1 justify-center">
-                <h1 className="text-2xl font-bold">Scatter Charts</h1>
-
-                <List
-                    itemLayout="horizontal"
-                    dataSource={barData}
-                    renderItem={(item) => (
-                        <List.Item
-                            actions={[
-                                <Button
-                                    color="primary"
-                                    variant="solid"
-                                    onClick={() => {
-                                        setOpen(true);
-                                        setSelectedChart(item);
-                                    }}
-                                >
-                                    Open Chart
-                                </Button>,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                title={item.title}
-                                description={item.description}
-                            />
-                        </List.Item>
-                    )}
-                    style={{ width: "60%" }}
-                />
-            </div>
-            <Drawer
-                push={false}
-                open={open}
-                onClose={() => {
-                    setOpen(false);
-                    setSelectedChart(null);
-                    setMiniOpen(false)
-                }}
-                width={700}
-            >
-                {renderChart()}
-                <Button
-                    color="primary"
-                    variant="outlined"
-                    onClick={() => setMiniOpen(true)}
-                >
-                    Show mini chart
-                </Button>
-                <Drawer
-                    placement="bottom"
-                    open={miniOpen}
-                    onClose={() => setMiniOpen(false)}
-                    getContainer={false}
-                >
-                    <div className="h-full w-full rounded-xl bg-black p-3 shadow-lg border border-[#334155]">
-                        <ReactECharts
-                            ref={echartsRef}
-                            option={scatterEchartsOptions}
-                            style={{ height: "100%", width: "100%" }}
-                            theme="dark"
-                        />
-                    </div>
-                </Drawer>
-            </Drawer>
-        </div>
+        <ChartDisplay
+            MiniChart={MiniChart}
+            renderChart={renderChart}
+            selectedChart={selectedChart}
+            setSelectedChart={setSelectedChart}
+            name={"Scatter Chart"}
+            echartsRef={echartsRef}
+            SparkLinechart={SparkLinechart}
+        />
     );
 }
 
