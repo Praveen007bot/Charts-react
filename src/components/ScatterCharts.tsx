@@ -1,4 +1,3 @@
-
 import { useRef, useState } from "react";
 import {
     CartesianGrid,
@@ -37,6 +36,10 @@ ChartJS.register(
 );
 import { Scatter as ChartJSScatter } from "react-chartjs-2";
 import ChartDisplay from "./ChartDisplay";
+import {
+    Sparklines,
+    SparklinesLine,
+} from "react-sparklines";
 
 const scatterApexOptions: ApexOptions = {
     xaxis: {},
@@ -51,7 +54,10 @@ const scatterApexSeries: ApexAxisChartSeries = [
 ];
 
 const scatterEchartsOptions = {
-    xAxis: {},
+    xAxis: {
+        min: 2.5,
+        max: 5
+    },
     yAxis: {},
     series: [
         {
@@ -80,6 +86,20 @@ function MiniChart() {
             option={scatterEchartsOptions}
             style={{ height: 300, width: "100%" }}
         />
+    );
+}
+
+function SparkLinechart() {
+    return (
+        <Sparklines
+            data={scatterData.map((item) => item.x)}
+            style={{ width: "100%", height: "100%" }}
+            limit={10}
+        >
+            <SparklinesLine
+                style={{ strokeWidth: 3, stroke: "#336aff", fill: "none" }}
+            />
+        </Sparklines>
     );
 }
 
@@ -145,6 +165,7 @@ function ScatterCharts() {
             setSelectedChart={setSelectedChart}
             name={"Scatter Chart"}
             echartsRef={echartsRef}
+            SparkLinechart={SparkLinechart}
         />
     );
 }

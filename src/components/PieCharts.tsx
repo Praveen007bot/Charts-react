@@ -1,6 +1,6 @@
 
 import { useRef, useState } from "react";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip as ReChartsTooltip } from "recharts";
 import { pieData } from "../../data";
 import type { ChartType } from "./BarCharts";
 import ReactApexChart from "react-apexcharts";
@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import { Pie as ChartJSPie } from "react-chartjs-2";
 import ChartDisplay from "./ChartDisplay";
+import { PieChart as MiniPie } from 'react-minimal-pie-chart';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -143,6 +144,16 @@ function MiniChart() {
     );
 }
 
+function SparkLinechart() {
+    return (
+        <MiniPie 
+            data={pieData}
+
+        />
+        
+    );
+}
+
 function PieCharts() {
     const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
     const echartsRef = useRef<any>(null);
@@ -167,6 +178,7 @@ function PieCharts() {
                                     />
                                 ))}
                             </Pie>
+                        <ReChartsTooltip />
                         </PieChart>
                     </ResponsiveContainer>
                 );
@@ -208,6 +220,7 @@ function PieCharts() {
             setSelectedChart={setSelectedChart}
             name={"Pie Chart"}
             echartsRef={echartsRef}
+            SparkLinechart={SparkLinechart}
         />
     );
 }

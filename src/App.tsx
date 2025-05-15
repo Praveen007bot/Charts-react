@@ -6,7 +6,7 @@ function App() {
     const navigate = useNavigate();
     return (
         <div className="h-screen flex justify-center p-6">
-            <Space size="large">
+            <Space size="large" className="flex flex-col lg:flex-row">
                 <Card
                     style={{ width: 300 }}
                     title={"Stacked Bar Charts"}

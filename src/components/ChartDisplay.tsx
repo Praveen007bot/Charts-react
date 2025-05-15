@@ -11,13 +11,22 @@ export type ChartType = {
 type ChartDisplayProps = {
     renderChart: () => React.JSX.Element;
     MiniChart: () => React.JSX.Element;
-    setSelectedChart: React.Dispatch<React.SetStateAction<ChartType | null>>
-    selectedChart: ChartType | null
-    name: string
-    echartsRef: React.RefObject<any>
+    SparkLinechart: () => React.JSX.Element;
+    setSelectedChart: React.Dispatch<React.SetStateAction<ChartType | null>>;
+    selectedChart: ChartType | null;
+    name: string;
+    echartsRef: React.RefObject<any>;
 };
 
-function ChartDisplay({ renderChart, MiniChart, setSelectedChart, selectedChart, name, echartsRef }: ChartDisplayProps) {
+function ChartDisplay({
+    renderChart,
+    MiniChart,
+    setSelectedChart,
+    selectedChart,
+    name,
+    echartsRef,
+    SparkLinechart
+}: ChartDisplayProps) {
     const [open, setOpen] = useState(false);
     const [miniOpen, setMiniOpen] = useState(false);
 
@@ -68,6 +77,9 @@ function ChartDisplay({ renderChart, MiniChart, setSelectedChart, selectedChart,
                     renderItem={(item) => (
                         <List.Item
                             actions={[
+                                <div className="border-black border-2 w-40 h-12 p-0">
+                                    <SparkLinechart />
+                                </div>,
                                 <Button
                                     color="primary"
                                     variant="solid"

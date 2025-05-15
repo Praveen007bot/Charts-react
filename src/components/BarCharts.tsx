@@ -23,6 +23,7 @@ import {
 } from "chart.js";
 import { Bar as ChartJsBar } from "react-chartjs-2";
 import ChartDisplay from "./ChartDisplay";
+import { Sparklines, SparklinesBars } from "react-sparklines";
 
 ChartJS.register(
     CategoryScale,
@@ -143,11 +144,23 @@ function MiniChart() {
     );
 }
 
+function SparkLinechart() {
+    return (
+        <Sparklines
+            data={stackedBarData.map((item) => item.sales)}
+            style={{ width: "100%", height: "100%" }}
+            limit={10}
+        >
+            <SparklinesBars
+                style={{ stroke: "white", strokeWidth: "1", fill: "#40c0f5" }}
+            />
+        </Sparklines>
+    );
+}
+
 function BarCharts() {
     const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
     const echartsRef = useRef<any>(null);
-
-    
 
     const renderChart = () => {
         switch (selectedChart?.title) {
@@ -199,7 +212,17 @@ function BarCharts() {
         }
     };
 
-    return <ChartDisplay MiniChart={MiniChart} renderChart={renderChart} selectedChart={selectedChart} setSelectedChart={setSelectedChart} name={"Stacked Bar Chart"} echartsRef={echartsRef}/>;
+    return (
+        <ChartDisplay
+            MiniChart={MiniChart}
+            renderChart={renderChart}
+            selectedChart={selectedChart}
+            setSelectedChart={setSelectedChart}
+            name={"Stacked Bar Chart"}
+            echartsRef={echartsRef}
+            SparkLinechart={SparkLinechart}
+        />
+    );
 }
 
 export default BarCharts;
